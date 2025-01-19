@@ -22,6 +22,9 @@ kotlin {
       implementation(libs.koin.androidx.compose)
     }
     commonMain.dependencies {
+      implementation(projects.platform.data)
+      implementation(projects.platform.model)
+
       implementation(libs.haze)
 
       implementation(compose.runtime)

@@ -15,9 +15,15 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.easy.wallet.network.httpClient
+import org.easy.wallet.network.source.BlockChairController
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-private fun httpClientWithDefault(serializersModule: SerializersModule? = null, special: HttpClientConfig<*>.() -> Unit = {}): HttpClient =
+enum class SourceQualifier {
+  BLOCK_CHAIR
+}
+
+private fun httpClientWithDefault(serializersModule: SerializersModule? = null, config: HttpClientConfig<*>.() -> Unit = {}): HttpClient =
   httpClient {
     install(HttpCookies)
     install(ContentNegotiation) {
@@ -41,20 +47,22 @@ private fun httpClientWithDefault(serializersModule: SerializersModule? = null, 
         }
       }
     }
-    special()
+    config()
   }
 
 val networkModule = module {
-  single {
+  single(qualifier = named(SourceQualifier.BLOCK_CHAIR)) {
     httpClientWithDefault {
       defaultRequest {
         url {
           protocol = URLProtocol.HTTPS
-          host = "staging.askquin.cn"
+          host = "api.blockchair.com"
           path("/")
         }
         header("Content-Type", "application/json")
       }
     }
   }
+
+  factory { BlockChairController(get(qualifier = named(SourceQualifier.BLOCK_CHAIR))) }
 }

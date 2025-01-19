@@ -19,7 +19,6 @@ kotlin {
         implementation(libs.ktor.logging)
         implementation(libs.kotlinx.coroutines.core)
         implementation(libs.koin.core)
-
         implementation(libs.kermit)
       }
     }
